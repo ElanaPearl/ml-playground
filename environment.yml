@@ -1,0 +1,7 @@
+name: ml-env
+dependencies:
+  - pytorch
+  - ipykernel
+  - pip
+  - pip:
+    - torchtyping
