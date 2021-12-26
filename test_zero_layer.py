@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from zero_layer_transformer import Embedder
+from zero_layer_transformer import Embedder, Unembedder
 
 
 def test_embedder():
@@ -20,4 +20,30 @@ def test_embedder():
     embedder.backward(act_grads)
     assert torch.allclose(
         embedder.param_grads, torch.tensor([[0.0, 0.0], [4.0, 5.0], [2.0, 2.0]])
+    )
+
+
+def test_unembedder():
+    n_vocab = 3
+    d_model = 2
+    n_tokens = 4
+    # acts = 1,4,2 param = 2,3
+
+    unembedder = Unembedder(n_vocab=n_vocab, d_model=d_model)
+    unembedder.param = torch.nn.Parameter(
+        torch.tensor([[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]])
+    )
+    acts = torch.tensor([[[1.0, 1.0], [2.0, 2.0], [3.0, 3.0], [4.0, 4.0]]])
+
+    logits = unembedder(acts)
+    assert logits.shape == torch.Size([1, n_tokens, n_vocab])
+
+    logit_grads = torch.ones_like(logits)
+    act_grads = unembedder.backward(logit_grads)
+
+    assert torch.allclose(
+        unembedder.param_grads, torch.tensor([[10.0, 10.0, 10.0], [10.0, 10.0, 10.0]])
+    )
+    assert torch.allclose(
+        act_grads, torch.tensor([[[3.0, 6.0], [3.0, 6.0], [3.0, 6.0], [3.0, 6.0]]])
     )
