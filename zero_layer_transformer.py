@@ -52,6 +52,5 @@ class Unembedder(torch.nn.Module):
         return torch.einsum("bnd,dv->bnv", embedding, self.param)
 
     def backward(self, logit_grads: Logits) -> Acts:
-        # set self.param_grads = grad w.r.t param
-        # return grad w.r.t embedding
-        pass
+        self.param_grads = torch.einsum("bnd,bnv->dv", self.embedding, logit_grads)
+        return torch.einsum("bnv,dv->bnd", logit_grads, self.param)
