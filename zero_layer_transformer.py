@@ -9,6 +9,7 @@ Logits = TensorType["n_batch", "n_tokens", "n_vocab"]
 
 class ZeroLayerTransformer(torch.nn.Module):
     def __init__(self, embedder: torch.nn.Module, unembedder: torch.nn.Module):
+        super().__init__()
         self.embedder = embedder
         self.unembedder = unembedder
 
@@ -24,6 +25,7 @@ class ZeroLayerTransformer(torch.nn.Module):
 
 class Embedder(torch.nn.Module):
     def __init__(self, n_vocab: int, d_model: int):
+        super().__init__()
         self.n_vocab = n_vocab
         self.d_model = d_model
         self.param = torch.nn.Parameter(torch.empty((n_vocab, d_model)))
@@ -34,7 +36,6 @@ class Embedder(torch.nn.Module):
         return self.param[tokens]
 
     def backward(self, embedding_grads: Acts):
-        assert self.tokens
         self.param_grads = torch.zeros(self.n_vocab, self.d_model)
         self.param_grads.index_add_(dim=0, index=self.tokens, source=embedding_grads)
         del self.tokens
@@ -42,6 +43,7 @@ class Embedder(torch.nn.Module):
 
 class Unembedder(torch.nn.Module):
     def __init__(self, n_vocab: int, d_model: int):
+        super().__init__()
         self.n_vocab = n_vocab
         self.param = torch.nn.Parameter(torch.empty((d_model, n_vocab)))
 
