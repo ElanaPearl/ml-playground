@@ -1,4 +1,5 @@
-""" Example usage: python build_training_data.py all_too_well_lyrics.txt creates all_too_well_lyrics.pt """
+""" Example usage: python build_training_data.py all_too_well_lyrics.txt creates
+all_too_well_lyrics.pt """
 import os
 from typing import List
 
@@ -26,10 +27,15 @@ def turn_text_into_repeated_tokens(
     tokenizer = make_word_level_tokenizer(flattened_text)
 
     tokenized = [tokenizer[w] for w in flattened_text + [END_TOKEN]]
-    token_tensor = torch.tensor(tokenized * (desired_token_len // len(tokenized)))
+    num_repeats = desired_token_len // len(tokenized)
+    token_tensor = torch.tensor(tokenized).repeat(num_repeats)
 
     token_path = os.path.splitext(text_path)[0] + ".pt"
     torch.save(token_tensor, token_path)
+    print(
+        f"Saved tokenized data to {token_path}. To reach the desired token length "
+        f"of {desired_token_len:,} tokens your text was repeated {num_repeats:,} times"
+    )
 
 
 if __name__ == "__main__":
