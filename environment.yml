@@ -6,3 +6,4 @@ dependencies:
   - pip:
     - torchtyping
     - pytest
+    - fire
