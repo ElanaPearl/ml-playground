@@ -47,3 +47,15 @@ def test_unembedder():
     assert torch.allclose(
         act_grads, torch.tensor([[[3.0, 6.0], [3.0, 6.0], [3.0, 6.0], [3.0, 6.0]]])
     )
+
+
+# def basic_integration_test():
+#     n_vocab = 3
+#     d_model = 16
+#     model = ZeroLayerTransformer(
+#         embedder=Embedder(n_vocab=n_vocab, d_model=d_model),
+#         unembedder=Unembedder(n_vocab=n_vocab, d_model=d_model),
+#     )
+
+#     tokens = torch.arange(n_vocab).repeat(1000)
+#     preds = model.forward(tokens)
