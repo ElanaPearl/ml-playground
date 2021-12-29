@@ -1,3 +1,5 @@
+from typing import List
+
 import torch
 from torch import Tensor
 from torchtyping import TensorType
@@ -36,8 +38,8 @@ class Embedder(torch.nn.Module):
         return self.param[tokens]
 
     def backward(self, embedding_grads: Acts):
-        self.param_grads = torch.zeros(self.n_vocab, self.d_model)
-        self.param_grads.index_add_(dim=0, index=self.tokens, source=embedding_grads)
+        self.grad = torch.zeros(self.n_vocab, self.d_model)
+        self.grad.index_add_(dim=0, index=self.tokens, source=embedding_grads)
         del self.tokens
 
 
@@ -52,5 +54,5 @@ class Unembedder(torch.nn.Module):
         return torch.einsum("bnd,dv->bnv", embedding, self.param)
 
     def backward(self, logit_grads: Logits) -> Acts:
-        self.param_grads = torch.einsum("bnd,bnv->dv", self.embedding, logit_grads)
+        self.param.grad = torch.einsum("bnd,bnv->dv", self.embedding, logit_grads)
         return torch.einsum("bnv,dv->bnd", logit_grads, self.param)
