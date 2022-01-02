@@ -31,9 +31,6 @@ class Adam:
         beta_1 = self.beta_1
         beta_2 = self.beta_2
 
-        def add_to_moving_average(old, new, beta):
-            return old * beta + new * (1 - beta)
-
         for p in self.params:
             first_moment = add_to_moving_average(
                 old=self.first_moments[p], new=p.grad, beta=beta_1
@@ -50,3 +47,7 @@ class Adam:
             )
             self.first_moments[p] = first_moment
             self.second_moments[p] = second_moment
+
+
+def add_to_moving_average(old, new, beta):
+    return old * beta + new * (1 - beta)
