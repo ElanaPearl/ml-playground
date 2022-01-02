@@ -20,7 +20,11 @@ def softmax(logits: Logits) -> Tensor:
 class SoftmaxCrossEntropyLoss:
     def forward(self, logits: Logits, labels: Tokens) -> Tensor:
         probs = softmax(logits)
-        return -probs.gather(dim=2, index=labels[:, :, None]).log().sum()
+        vocab_dim = 2
+        # probs are BxNxV but labels are BxN so labels need an extra dim for gather
+        reshaped_labels = labels.unsqueeze(vocab_dim)
+        predicted_probs_for_labels = probs.gather(dim=vocab_dim, index=reshaped_labels)
+        return -predicted_probs_for_labels.log().sum()
 
 
 def train_step(
