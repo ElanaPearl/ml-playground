@@ -1,6 +1,7 @@
 import pytest
 import torch
 
+from train_zero_layer import SoftmaxCrossEntropyLoss
 from zero_layer_transformer import Embedder, Unembedder, ZeroLayerTransformer
 
 
@@ -47,6 +48,16 @@ def test_unembedder():
     assert torch.allclose(
         act_grads, torch.tensor([[[3.0, 6.0], [3.0, 6.0], [3.0, 6.0], [3.0, 6.0]]])
     )
+
+
+def test_cross_entropy_loss():
+    labels = torch.LongTensor([[0]])
+    correct_logits = torch.tensor([[[100.0, -100.0]]])
+    incorrect_logits = torch.tensor([[[-100.0, 100.0]]])
+
+    loss_fn = SoftmaxCrossEntropyLoss()
+    assert loss_fn.forward(logits=correct_logits, labels=labels).item() == 0.0
+    assert loss_fn.forward(logits=incorrect_logits, labels=labels).item() > 100
 
 
 # def basic_integration_test():
