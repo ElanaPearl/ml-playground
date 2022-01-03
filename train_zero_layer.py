@@ -21,10 +21,10 @@ class Softmax:
 
     def backward(self, softmax_grads: Tensor) -> Logits:
         """Equation to calculate derivative of softmax:
-        dL/dx_i = dL/d_Si * dS_i/dx_i + ∑_{i!=j} dL/d_Sj * dS_j/dx_i
+        dL/dx_i = ∑_j dL/d_Sj * dS_j/dx_i [by chain rule]
         where S_i = softmax(x_i) and:
             dS_i/dx_i = S_i(1 - S_i)
-            dS_i/dx_j = S_i*S_j
+            dS_i/dx_j = S_i*S_j [when i!=j]
         """
 
         kronecker_delta = torch.eye(self.probs.shape[2])
