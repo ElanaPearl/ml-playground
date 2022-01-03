@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from train_zero_layer import SoftmaxCrossEntropyLoss
+from train_zero_layer import Softmax, SoftmaxCrossEntropyLoss
 from zero_layer_transformer import Embedder, Unembedder, ZeroLayerTransformer
 
 
@@ -58,6 +58,28 @@ def test_cross_entropy_loss():
     loss_fn = SoftmaxCrossEntropyLoss()
     assert loss_fn.forward(logits=correct_logits, labels=labels).item() == 0.0
     assert loss_fn.forward(logits=incorrect_logits, labels=labels).item() > 100
+
+
+def test_softmax():
+    logit_tensor = torch.tensor([[[2.0, 1.0], [1.0, 1.0], [2.0, 1.0]]])
+    softmax_grads = torch.ones_like(logit_tensor)
+
+    # Run softmax written from scratch
+    model = Softmax()
+    logits = torch.nn.Parameter(logit_tensor)
+    probs = model.forward(logits)
+    grads = model.backward(softmax_grads)
+
+    # Compare to pytorch softmax as reference
+    pytorch_model = torch.nn.Softmax(dim=2)
+    # Define logit param separately to ensure no info leaking between models
+    pytorch_logits = torch.nn.Parameter(logit_tensor)
+    pytorch_probs = model.forward(pytorch_logits)
+    pytorch_probs.backward(softmax_grads)
+    pytorch_grads = pytorch_logits.grad
+
+    assert torch.allclose(probs, pytorch_probs)
+    assert torch.allclose(grads, pytorch_grads)
 
 
 # def basic_integration_test():
